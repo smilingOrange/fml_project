@@ -72,6 +72,7 @@ def main():
 
     scaler = torch.amp.GradScaler('cuda')
     epochs = 200
+    best_acc = 0;
 
     # 5. Training Loop
     for epoch in range(epochs):
@@ -133,6 +134,16 @@ def main():
                   f"Train Loss: {running_loss/total:.4f} | "
                   f"Train Acc: {train_acc:.2f}% | "
                   f"Test Acc: {test_acc:.2f}%")
+            
+        if test_acc > best_acc:
+            best_acc = test_acc
+            torch.save({
+                'epoch': epoch + 1,
+                'model_state_dict': eval_model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'test_acc': test_acc,
+            }, 'best_cifar10_resnet18.pth')
+            print(f"--> Saved new best checkpoint with Test Acc: {test_acc:.2f}%")        
 
 if __name__ == '__main__':
     main()
